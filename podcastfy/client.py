@@ -74,8 +74,10 @@ def process_content(
 
             if urls:
                 logger.info(f"Processing {len(urls)} links")
-                contents = [content_extractor.extract_content(link) for link in urls]
+                contents = [content_extractor.extract_content(
+                    link) for link in urls]
                 combined_content += "\n\n".join(contents)
+                logger.info(f"{combined_content}")
 
             if text:
                 combined_content += f"\n\n{text}"
@@ -115,20 +117,24 @@ def process_content(
                 output_directories.get("audio", "data/audio"), random_filename
             )
             text_to_speech.convert_to_speech(qa_content, audio_file)
-            logger.info(f"Podcast generated successfully using {tts_model} TTS model")
+            logger.info(
+                f"Podcast generated successfully using {tts_model} TTS model")
             return audio_file
         else:
-            logger.info(f"Transcript generated successfully: {transcript_filepath}")
+            logger.info(
+                f"Transcript generated successfully: {transcript_filepath}")
             return transcript_filepath
 
     except Exception as e:
-        logger.error(f"An error occurred in the process_content function: {str(e)}")
+        logger.error(
+            f"An error occurred in the process_content function: {str(e)}")
         raise
 
 
 @app.command()
 def main(
-    urls: list[str] = typer.Option(None, "--url", "-u", help="URLs to process"),
+    urls: list[str] = typer.Option(
+        None, "--url", "-u", help="URLs to process"),
     file: typer.FileText = typer.Option(
         None, "--file", "-f", help="File containing URLs, one per line"
     ),
@@ -192,7 +198,8 @@ def main(
 
         if transcript:
             if image_paths:
-                logger.warning("Image paths are ignored when using a transcript file.")
+                logger.warning(
+                    "Image paths are ignored when using a transcript file.")
             final_output = process_content(
                 transcript_file=transcript.name,
                 tts_model=tts_model,
@@ -208,7 +215,8 @@ def main(
         else:
             urls_list = urls or []
             if file:
-                urls_list.extend([line.strip() for line in file if line.strip()])
+                urls_list.extend([line.strip()
+                                 for line in file if line.strip()])
 
             if not urls_list and not image_paths and not text and not topic:
                 raise typer.BadParameter(
@@ -312,7 +320,8 @@ def generate_podcast(
 
         if transcript_file:
             if image_paths:
-                logger.warning("Image paths are ignored when using a transcript file.")
+                logger.warning(
+                    "Image paths are ignored when using a transcript file.")
             return process_content(
                 transcript_file=transcript_file,
                 tts_model=tts_model,
@@ -329,7 +338,8 @@ def generate_podcast(
             urls_list = urls or []
             if url_file:
                 with open(url_file, "r") as file:
-                    urls_list.extend([line.strip() for line in file if line.strip()])
+                    urls_list.extend([line.strip()
+                                     for line in file if line.strip()])
 
             if not urls_list and not image_paths and not text and not topic:
                 raise ValueError(

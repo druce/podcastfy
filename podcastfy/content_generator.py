@@ -79,9 +79,11 @@ class ContentGenerator:
         """
         os.environ["GOOGLE_API_KEY"] = api_key
         self.config = load_config()
-        self.content_generator_config = self.config.get("content_generator", {})
+        self.content_generator_config = self.config.get(
+            "content_generator", {})
 
-        self.config_conversation = load_conversation_config(conversation_config)
+        self.config_conversation = load_conversation_config(
+            conversation_config)
         self.tts_config = self.config_conversation.get("text_to_speech", {})
 
         # Get output directories from conversation config
@@ -102,7 +104,8 @@ class ContentGenerator:
                 "prompt_template", "souzatharsis/podcastfy_multimodal_cleanmarkup"
             )
             + ":"
-            + self.config.get("content_generator", {}).get("prompt_commit", "3d5b42fc")
+            + self.config.get("content_generator", {}
+                              ).get("prompt_commit", "3d5b42fc")
         )
 
         image_path_keys = []
@@ -127,7 +130,8 @@ class ContentGenerator:
         user_prompt_template = ChatPromptTemplate.from_messages(
             messages=[HumanMessagePromptTemplate.from_template(messages)]
         )
-        user_instructions = self.config_conversation.get("user_instructions", "")
+        user_instructions = self.config_conversation.get(
+            "user_instructions", "")
 
         user_instructions = (
             "[[MAKE SURE TO FOLLOW THESE INSTRUCTIONS OVERRIDING THE PROMPT TEMPLATE IN CASE OF CONFLICT: "
@@ -136,7 +140,8 @@ class ContentGenerator:
         )
 
         new_system_message = (
-            prompt_template.messages[0].prompt.template + "\n" + user_instructions
+            prompt_template.messages[0].prompt.template +
+            "\n" + user_instructions
         )
 
         # Create new prompt with updated system message
@@ -152,8 +157,9 @@ class ContentGenerator:
         )
 
         # Create a new ChatPromptTemplate object with the combined messages
-        composed_prompt_template = ChatPromptTemplate.from_messages(combined_messages)
-
+        composed_prompt_template = ChatPromptTemplate.from_messages(
+            combined_messages)
+        print(composed_prompt_template)
         return composed_prompt_template, image_path_keys
 
     def __compose_prompt_params(
@@ -264,7 +270,8 @@ class ContentGenerator:
             )
 
             num_images = 0 if is_local else len(image_file_paths)
-            self.prompt_template, image_path_keys = self.__compose_prompt(num_images)
+            self.prompt_template, image_path_keys = self.__compose_prompt(
+                num_images)
             self.parser = StrOutputParser()
             self.chain = self.prompt_template | llmbackend.llm | self.parser
 
@@ -359,18 +366,21 @@ def main(seed: int = 42, is_local: bool = False) -> None:
                 with open(os.path.join(transcript_dir, filename), "r") as file:
                     input_text += file.read() + "\n\n"
 
-        response = content_generator.generate_qa_content(input_text, is_local=is_local)
+        response = content_generator.generate_qa_content(
+            input_text, is_local=is_local)
 
         print("Generated Q&A Content:")
         output_file = os.path.join(
-            config.get("output_directories", {}).get("transcripts", "data/transcripts"),
+            config.get("output_directories", {}).get(
+                "transcripts", "data/transcripts"),
             "response.txt",
         )
         with open(output_file, "w") as file:
             file.write(response)
 
     except Exception as e:
-        logger.error(f"An error occurred while generating Q&A content: {str(e)}")
+        logger.error(
+            f"An error occurred while generating Q&A content: {str(e)}")
         raise
 
 
